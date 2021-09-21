@@ -66,7 +66,8 @@ def Delete_arp_entry():
     menu_interface()
     interface = input("Enter the interface name : ")
     ip = input("Enter the ip address :")
-    arp = os.popen(f"sudo ip n flush {ip} dev {interface} nud permanent").read()
+    #arp = os.popen(f"sudo ip n flush {ip} dev {interface} nud permanent").read()
+    arp = os.popen(f"sudo ip n del {ip} dev {interface}").read()
     print(os.popen("ip n show").read())
 
 def Restart_network():
