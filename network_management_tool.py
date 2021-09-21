@@ -1,26 +1,27 @@
 import os
+from rich.console import Console
+console = Console()
 
 def menu_interface():
     asd = os.popen("ip -o link show | awk -F': ' '{print $2}'").read()
-    print("-----------Menu for interface------------")
-    asd = " ".join(asd.split(":\n"))
-    print(asd.replace(' ', '\n'))
+    console.print("-----------Menu for interface------------")
+    print(asd)
 
-def Assign_IP_address():
+def Assign_ip_add():
     menu_interface()
     interface = input("Enter the interface name : ")
     ip = input("Enter the ip address to assign :")
     ip_assign = os.popen(f"sudo ip address add {ip} dev {interface}").read()
     print(os.popen(f"ip -4 a show {interface}").read())
 
-def Delete_IP_address():
+def Delete_ip_add():
     menu_interface()
     interface = input("Enter the interface name : ")
     ip = input("Enter the ip address to delete :")
     ip_assign = os.popen(f"sudo ip address del {ip} dev {interface}").read()
     print(os.popen(f"ip -4 a show {interface}").read())
 
-def Display_IP_address():
+def Display_ip_add():
     menu_interface()
     interface = input("Enter the interface name : ")
     print(os.popen(f"ip -4 a show {interface}").read())
@@ -35,16 +36,16 @@ def Configure_routing():
     ip_assign = os.popen(f"sudo ip r add 10.2.3.0/24 via {ip} dev {interface}").read()
     print(os.popen("ip r").read())
     
-def Turn_OnOff_interface():
+def Turn_On_Off_interface():
     while True:
-        print("1.Turn on interface")
-        print("2.Turn off interface")
-        print("3.exit")
+        console.print("1.Turn on interface",style="bold cyan")
+        console.print("2.Turn off interface",style="bold cyan")
+        console.print("3.exit",style="bold cyan")
         ch = int(input("Enter the choice"))
         if ch == 1:
             menu_interface()
             interface = input("Enter the interface name : ")
-            on = os.popen(f"sudo ip link set dev {interface} un").read()
+            on = os.popen(f"sudo ip link set dev {interface} up").read()
             print(os.popen("ip a").read())
         elif ch == 2:
             menu_interface()
@@ -54,22 +55,21 @@ def Turn_OnOff_interface():
         else:
             break
             
-def Add_ARP_entry():
+def Add_arp_entry():
     menu_interface()
     interface = input("Enter the interface name : ")
     ip = input("Enter the ip address :")
-    cmd = f"sudo ip n add {ip} lladdr 00:45:78:52:ed:55 dev {interface} nud permanent"
-    arp = os.popen(cmd).read()
+    arp = os.popen(f"sudo ip n add {ip} lladdr 00:45:78:52:ed:55 dev {interface} nud permanent").read()
     print(os.popen("ip n show").read())
 
-def Delete_ARP_Entry():
+def Delete_arp_entry():
     menu_interface()
     interface = input("Enter the interface name : ")
     ip = input("Enter the ip address :")
     arp = os.popen(f"sudo ip n flush {ip} dev {interface} nud permanent").read()
     print(os.popen("ip n show").read())
 
-def Restart_Network():
+def Restart_network():
     print(os.popen("sudo systemctl status networking").read())
 
 def Change_hostname():
@@ -77,35 +77,42 @@ def Change_hostname():
     change_host = os.popen(f"sudo hostname {name}").read()
     print(os.popen("hostnamectl status").read())
     
-def Add_DNS_server_entry():
-    dns = os.popen("sudo cat >> /etc/resolv.conf").read()
+def Add_dns_server_entry():
+    os.popen("sudo cat >> /etc/resolv.conf").read()
     print("Successfully added")
 
+def Exit():
+	console.print("Successfully Exited",style="bold green")
+	exit()
+	
+
 def main_menu():
-    print("1.Assign IP address")
-    print("2.Delete IP address")
-    print("3.Display IP address")
-    print("4.Display all interfaces")
-    print("5.Configure routing")
-    print("6.Turn On/Off interface")
-    print("7.Add ARP entry")
-    print("8.Delete ARP Entry")
-    print("9.Restart Network")
-    print("10.Change Hostname")
-    print("11.Add DNS server entry")
+    console.print("\t1.Assign IP address",style="bold blue")
+    console.print("\t2.Delete IP address",style="bold blue")
+    console.print("\t3.Display IP address",style="bold blue")
+    console.print("\t4.Display all interfaces",style="bold blue")
+    console.print("\t5.Configure routing",style="bold blue")
+    console.print("\t6.Turn On/Off interface",style="bold blue")
+    console.print("\t7.Add ARP entry",style="bold blue")
+    console.print("\t8.Delete ARP Entry",style="bold blue")
+    console.print("\t9.Restart Network",style="bold blue")
+    console.print("\t10.Change Hostname",style="bold blue")
+    console.print("\t11.Add DNS server entry",style="bold blue")
+    console.print("\t12.Exit",style="bold blue")
 
 operations = {
-    "1":Assign_IP_address,
-    "2":Delete_IP_address,
-    "3":Display_IP_address,
+    "1":Assign_ip_add,
+    "2":Delete_ip_add,
+    "3":Display_ip_add,
     "4":Display_all_interfaces,
     "5":Configure_routing,
-    "6":Turn_OnOff_interface,
-    "7":Add_ARP_entry,
-    "8":Delete_ARP_Entry,
-    "9":Restart_Network,
+    "6":Turn_On_Off_interface,
+    "7":Add_arp_entry,
+    "8":Delete_arp_entry,
+    "9":Restart_network,
     "10":Change_hostname,
-    "11":Add_DNS_server_entry
+    "11":Add_dns_server_entry,
+    "12":Exit
 }
 
 while True:
