@@ -1,5 +1,6 @@
 import os
 from rich.console import Console
+from rich.prompt import Prompt
 console = Console()
 
 def menu_interface():
@@ -29,13 +30,22 @@ def Display_ip_add():
 def Display_all_interfaces():
 	print(os.popen("ip l").read())
 
+#def Configure_routing():
+#	menu_interface()
+#	interface = input("Enter the interface name : ")
+#	ip = input("Enter the ip address :")
+#	ip_assign = os.popen(f"sudo ip r add 10.2.3.0/24 via {ip} dev {interface}").read()
+#	print(os.popen("ip r").read())
+	
 def Configure_routing():
-	menu_interface()
-	interface = input("Enter the interface name : ")
-	ip = input("Enter the ip address :")
-	ip_assign = os.popen(f"sudo ip r add 10.2.3.0/24 via {ip} dev {interface}").read()
-	print(os.popen("ip r").read())
-    
+
+	nwadd = input("Enter network ip address: ")
+	gtwayadd = input("Enter gateway ip address: ")
+	cmd = f"ip r add {nwadd} via {gtwayadd}"
+	res = os.popen(cmd).read()
+	console.print(res)
+	console.print("configuration completed successfully")   
+	
 def Turn_On_Off_interface():
 	while True:
 		console.print("1.Turn on interface",style="bold cyan")
@@ -54,21 +64,40 @@ def Turn_On_Off_interface():
 			print(os.popen("ip a").read())
 		else:
 			break
-            
 def Add_arp_entry():
-	menu_interface()
-	interface = input("Enter the interface name : ")
-	ip = input("Enter the ip address :")
-	arp = os.popen(f"sudo ip n add {ip} lladdr 00:45:78:52:ed:55 dev {interface} nud permanent").read()
-	print(os.popen("ip n show").read())
-
+	ip = input("Enter new ip address for add: ")
+	mac_add = input("Enter mac address for add: ")
+	intf_name = Prompt.ask("Enter interface name : ")
+	arp = os.popen("ip n show").read()
+	cmd1 = f"sudo ip n add {ip} lladdr {mac_add} dev {intf_name} nud permanent"
+	res = os.popen(cmd1).read()
+	console.print(arp)
+	console.print("ARP Entry successfull")
+	
 def Delete_arp_entry():
-	menu_interface()
-	interface = input("Enter the interface name : ")
-	ip = input("Enter the ip address :")
-	arp = os.popen(f"sudo ip n del {ip} dev {interface}").read()
-	#arp = os.popen(f"sudo ip n flush {ip} dev {interface} nud permanent").read()
-	print(os.popen("ip n show").read())
+	
+	ip = input("Enter ip address which u want to del: ")
+	intf_name = Prompt.ask("Enter interface name : ")
+	#cmd = "ip n show"
+	cmd = f"sudo ip n del {ip} dev {intf_name}"
+	res = os.popen(cmd).read()
+	#console.print(res)
+	console.print("ARP Entry deleted successfully")
+		         
+#def Add_arp_entry():
+#	menu_interface()
+#	interface = input("Enter the interface name : ")
+#	ip = input("Enter the ip address :")
+#	arp = os.popen(f"sudo ip n add {ip} lladdr 00:45:78:52:ed:55 dev {interface} nud permanent").read()
+#	print(os.popen("ip n show").read())
+
+#def Delete_arp_entry():
+#	menu_interface()
+#	interface = input("Enter the interface name : ")
+#	ip = input("Enter the ip address :")
+#	arp = os.popen(f"sudo ip n del {ip} dev {interface}").read()
+#	#arp = os.popen(f"sudo ip n flush {ip} dev {interface} nud permanent").read()
+#	print(os.popen("ip n show").read())
 
 def Restart_network():
 	print(os.popen("sudo systemctl status networking").read())
@@ -79,7 +108,9 @@ def Change_hostname():
 	print(os.popen("hostnamectl status").read())
     
 def Add_dns_server_entry():
-	os.popen("sudo cat >> /etc/resolv.conf").read()
+	ip = Prompt.ask("Enter DNS server")
+	with open("/etc/resolv.conf", "a") as f:
+		f.write(f"nameserver {ip}\n")
 	print("Successfully added")
 
 def Exit():
